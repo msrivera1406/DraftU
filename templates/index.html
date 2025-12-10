@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DraftU | Tu Horario Perfecto</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="header-nav">
+        <div class="nav-container">
+            <div class="logo">
+             <img src="{{ url_for('static', filename='images/DraftU2.png') }}" alt="DraftU Logo" class="logo-img">
+            </div>
+            <nav class="menu">
+                <a href="/">Inicio</a>
+                <a href="/builder">Generar</a>
+            </nav>
+        </div>
+    </header>
+    <main class="hero-section">
+        <div class="hero-image">
+            <img src="{{ url_for('static', filename='images/Reloj2.png') }}" alt="Hourglass Line Art" class="hourglass-img">
+        </div>
+        <div class="hero-text">
+            <h1>Tu horario perfecto<span class="thin-font"> en segundos</span></h1>
+            <a href="/builder" class="cta-button">Comienza ahora</a>
+        </div>
+    </main>
+    <section class="features-section">
+        
+        <div class="feature-card">
+            <h3>Rápido</h3>
+            <div class="icon-circle">
+                <img src="{{ url_for('static', filename='images/rayo.png') }}" alt="Rayo" class="icon-img">
+            </div>
+            <p>Genera cientos de<br>opciones al instante</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>Seguro</h3>
+            <div class="icon-circle">
+                <img src="{{ url_for('static', filename='images/escudo.png') }}" alt="Escudo" class="icon-img">
+            </div>
+            <p>Detección de<br>conflictos matemática</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>Inteligente</h3>
+            <div class="icon-circle">
+                <img src="{{ url_for('static', filename='images/cerebro.png') }}" alt="Cerebro" class="icon-img">
+            </div>
+            <p>Prioriza la importancia<br>de tu tiempo</p>
+        </div>
+
+    </section>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DraftU | Resultados</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="builder-container">
+        <header class="header-simple">
+            <a href="/">
+                <img src="{{ url_for('static', filename='images/DraftU2.png') }}" alt="DraftU" class="logo-small">
+            </a>
+        </header>
+
+        <div class="results-header">
+            <h2>HORARIOS DISPONIBLES</h2>
+            
+            <div class="navigation-controls">
+                <button class="nav-arrow" onclick="prevOption()">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                
+                <span id="optionCounter" class="option-counter">01 de 00</span>
+                
+                <button class="nav-arrow" onclick="nextOption()">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+            
+        </div>
+
+        <div class="schedule-container">
+            
+            <div class="days-header">
+                <div class="time-corner">
+                    <button class="corner-expand-btn" onclick="toggleExpand()" title="Pantalla Completa">
+                        <i class="fa-solid fa-expand" id="expandIcon"></i>
+                    </button>
+                </div> 
+                <div class="day-label">LUN</div>
+                <div class="day-label">MAR</div>
+                <div class="day-label">MIÉ</div>
+                <div class="day-label">JUE</div>
+                <div class="day-label">VIE</div>
+                <div class="day-label">SÁB</div>
+            </div>
+
+            <div class="scrollable-grid">
+                
+                <div class="time-column">
+                    </div>
+
+                <div class="days-grid" id="daysGrid">
+                    <div class="day-column" data-day="0"></div> <div class="day-column" data-day="1"></div>
+                    <div class="day-column" data-day="2"></div>
+                    <div class="day-column" data-day="3"></div>
+                    <div class="day-column" data-day="4"></div>
+                    <div class="day-column" data-day="5"></div> </div>
+
+            </div>
+        </div>
+
+        <div class="bottom-bar" style="gap: 20px;">
+            <a href="/builder" class="generate-btn" style="background-color: #7ab572; text-decoration: none; text-align: center;">
+                Modificar materias
+            </a>
+            <button class="generate-btn" onclick="exportToICS()">
+                Exportar horario (.ics)
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- VARIABLES GLOBALES ---
+        let allSchedules = [];
+        let currentOptionIndex = 0;
+        
+        // Configuración de la Grilla
+        const START_HOUR = 7; // El calendario empieza a las 7:00 AM
+        const END_HOUR = 22;  // Termina a las 10:00 PM
+        const PIXELS_PER_HOUR = 40; // 1 hora = 60px de altura (1min = 1px)
+
+        // --- AL CARGAR ---
+        window.onload = function() {
+            // 1. Recuperar datos
+            const rawData = localStorage.getItem('schedulesResult');
+            if (!rawData) {
+                alert("No hay horarios generados. Vuelve al constructor.");
+                window.location.href = "/builder";
+                return;
+            }
+
+            const data = JSON.parse(rawData);
+            allSchedules = data.schedules;
+
+            if (allSchedules.length === 0) {
+                alert("No se encontraron combinaciones válidas.");
+                window.location.href = "/builder";
+                return;
+            }
+
+            // 2. Generar etiquetas de hora (7 AM - 10 PM)
+            renderTimeLabels();
+
+            // 3. Mostrar la primera opción
+            showOption(0);
+        };
+
+        // --- FUNCIONES DE RENDERIZADO ---
+
+        function renderTimeLabels() {
+            const timeCol = document.querySelector('.time-column');
+            timeCol.innerHTML = '';
+            
+            for (let h = START_HOUR; h <= END_HOUR; h++) {
+                const label = document.createElement('div');
+                label.className = 'time-label';
+                label.style.height = `${PIXELS_PER_HOUR}px`;
+                // Formato AM/PM simple
+                const suffix = h >= 12 ? 'PM' : 'AM';
+                const hourShow = h > 12 ? h - 12 : h;
+                label.innerText = `${hourShow} ${suffix}`;
+                timeCol.appendChild(label);
+            }
+        }
+
+        function showOption(index) {
+            // Validar límites
+            if (index < 0) index = allSchedules.length - 1; // Loop al final
+            if (index >= allSchedules.length) index = 0;    // Loop al inicio
+            
+            currentOptionIndex = index;
+
+            // Actualizar contador
+            document.getElementById('optionCounter').innerText = 
+                `${(index + 1).toString().padStart(2, '0')} de ${allSchedules.length}`;
+
+            // Limpiar grilla anterior
+            document.querySelectorAll('.day-column').forEach(col => col.innerHTML = '');
+
+            // Obtener la opción actual
+            const option = allSchedules[index];
+
+            // Pintar cada curso
+            option.cursos.forEach((curso, i) => {
+                // Asignar color consistente basado en el nombre (Hash simple) o índice
+                // Usaremos colores pastel cíclicos para que se vea bonito
+                const colors = ['#FFD1DC', '#D1E8FF', '#E8D1FF', '#D1FFD6', '#FFF5BA', '#FFCCB6'];
+                const color = colors[i % colors.length];
+
+                curso.bloques.forEach(bloque => {
+                    renderBlock(bloque, curso.nombre, curso.profesor, color);
+                });
+            });
+        }
+
+        function renderBlock(bloque, nombre, profe, color) {
+            // 1. Encontrar columna
+            const col = document.querySelector(`.day-column[data-day="${bloque.dia}"]`);
+            if (!col) return; 
+
+            // 2. Calcular Geometría
+            const startMinutes = bloque.inicio; 
+            const duration = bloque.fin - bloque.inicio;
+            const offsetStart = START_HOUR * 60;
+
+            const top = (startMinutes - offsetStart) * (PIXELS_PER_HOUR / 60);
+            const height = duration * (PIXELS_PER_HOUR / 60);
+
+            // 3. Crear el Bloque
+            const blockDiv = document.createElement('div');
+            blockDiv.className = 'class-block';
+            blockDiv.style.backgroundColor = color;
+            blockDiv.style.top = `${top}px`;
+            blockDiv.style.height = `${height}px`; // Si es pequeño (30px), el CSS oculta el exceso
+            
+            
+            let contentHTML = '';
+                
+            // Si mide menos de 50px, solo ponemos el título
+            if (height < 50) {
+                contentHTML = `<div class="block-title">${nombre}</div>`;
+            } else {
+                // Si es grande, ponemos todo
+                contentHTML = `
+                    <div class="block-title">${nombre}</div>
+                    <div class="block-prof">${profe}</div>
+                    <div class="block-time">${formatTime(bloque.inicio)} - ${formatTime(bloque.fin)}</div>
+                `;
+            }
+
+            blockDiv.innerHTML = contentHTML;
+
+            // --- 4. NUEVO: LÓGICA DEL TOOLTIP ---
+            const tooltip = document.getElementById('customTooltip');
+            const ttTitle = document.getElementById('tooltipTitle');
+            const ttProf = document.getElementById('tooltipProf');
+            const ttTime = document.getElementById('tooltipTime');
+
+            // A. Entra el mouse: Llenar datos y mostrar
+            blockDiv.addEventListener('mouseenter', () => {
+                ttTitle.innerText = nombre;
+                ttProf.innerText = profe;
+                ttTime.innerText = `${formatTime(bloque.inicio)} - ${formatTime(bloque.fin)}`;
+                tooltip.style.display = 'block';
+                
+                // Ponerle un borde de color igual a la materia (detalle estético)
+                tooltip.style.borderLeft = `5px solid ${color}`;
+            });
+
+            // B. Mueve el mouse: El tooltip persigue al cursor
+            blockDiv.addEventListener('mousemove', (e) => {
+                // Le sumamos 15px para que no tape el cursor
+                // tooltip.style.left = (e.clientX + 15) + 'px'; 
+                // tooltip.style.top = (e.clientY + 15) + 'px';
+            // 1. Obtener dimensiones
+                const tooltipWidth = tooltip.offsetWidth;
+                const tooltipHeight = tooltip.offsetHeight;
+                const screenWidth = window.innerWidth;
+                const screenHeight = window.innerHeight;
+
+                // 2. Calcular posición base (A la derecha y abajo del mouse)
+                let leftPos = e.clientX + 15;
+                let topPos = e.clientY + 15;
+
+                // 3. CORRECCIÓN HORIZONTAL (Si se sale a la derecha)
+                if (leftPos + tooltipWidth > screenWidth) {
+                    // Lo ponemos a la IZQUIERDA del mouse
+                    leftPos = e.clientX - tooltipWidth - 15;
+                }
+
+                // 4. CORRECCIÓN VERTICAL (Si se sale por abajo)
+                if (topPos + tooltipHeight > screenHeight) {
+                    // Lo ponemos ARRIBA del mouse
+                    topPos = e.clientY - tooltipHeight - 15;
+                }
+
+                // 5. Aplicar
+                tooltip.style.left = leftPos + 'px';
+                tooltip.style.top = topPos + 'px';
+
+
+
+            });
+
+            // C. Sale el mouse: Ocultar
+            blockDiv.addEventListener('mouseleave', () => {
+                tooltip.style.display = 'none';
+            });
+
+            col.appendChild(blockDiv);
+        }        
+
+
+        // --- NAVEGACIÓN ---
+        function nextOption() { showOption(currentOptionIndex + 1); }
+        function prevOption() { showOption(currentOptionIndex - 1); }
+
+        // --- UTILIDADES ---
+        function formatTime(minutes) {
+            const h = Math.floor(minutes / 60);
+            const m = minutes % 60;
+            return `${h}:${m.toString().padStart(2, '0')}`;
+        }
+
+        function toggleExpand() {
+            const container = document.querySelector('.schedule-container');
+            const icon = document.getElementById('expandIcon');
+
+            // Alternar clase
+            container.classList.toggle('expanded-mode');
+
+            // Cambiar ícono
+            if (container.classList.contains('expanded-mode')) {
+                // Ícono de "Salir de pantalla completa" (Compress)
+                icon.className = "fa-solid fa-compress";
+                
+                // Bloquear el scroll de la página de fondo (body)
+                document.body.style.overflow = 'hidden';
+            } else {
+                // Ícono de "Pantalla completa" (Expand)
+                icon.className = "fa-solid fa-expand";
+                
+                // Restaurar scroll de la página
+                document.body.style.overflow = 'auto';
+            }
+        }
+        const SEMESTER_START = new Date(2026, 0, 19); // 19 de Enero de 2026
+        const SEMESTER_END_ICS = "20260527T235959Z";
+
+        function exportToICS() {
+            if (allSchedules.length === 0) return;
+
+            const schedule = allSchedules[currentOptionIndex];
+            let icsContent = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//DraftU//Horarios//ES\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\n";
+
+            schedule.cursos.forEach(curso => {
+                curso.bloques.forEach(bloque => {
+                    // 1. Calcular la FECHA EXACTA de la primera clase del semestre
+                    const firstDate = getFirstClassDate(bloque.dia);
+                    
+                    // 2. Formatear Fecha y Hora
+                    const startDateTime = formatICSDateTime(firstDate, bloque.inicio);
+                    const endDateTime = formatICSDateTime(firstDate, bloque.fin);
+
+                    // 3. Crear el evento
+                    icsContent += "BEGIN:VEVENT\r\n";
+                    icsContent += "UID:" + Date.now() + "_" + Math.floor(Math.random() * 100000) + "@draftu.com\r\n";
+                    icsContent += "DTSTAMP:" + new Date().toISOString().replace(/[-:.]/g, "").split("Z")[0] + "Z\r\n";
+                    
+                    icsContent += "SUMMARY:" + curso.nombre + "\r\n";
+                    icsContent += "DESCRIPTION:Profesor: " + curso.profesor + "\\nGenerado por DraftU\\nSemestre Ene-May 2025\r\n";
+                    
+                    // Usamos la zona horaria de México
+                    icsContent += "DTSTART;TZID=America/Mexico_City:" + startDateTime + "\r\n";
+                    icsContent += "DTEND;TZID=America/Mexico_City:" + endDateTime + "\r\n";
+                    
+                    // 4. REGLA DE REPETICIÓN PRECISA
+                    // Repetir semanalmente HASTA (UNTIL) la fecha de fin de semestre
+                    icsContent += "RRULE:FREQ=WEEKLY;UNTIL=" + SEMESTER_END_ICS + "\r\n";
+                    
+                    icsContent += "END:VEVENT\r\n";
+                });
+            });
+
+            icsContent += "END:VCALENDAR";
+
+            // Descargar
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.setAttribute('download', 'Horario_DraftU_2025.ics');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // --- UTILIDAD MATEMÁTICA PARA FECHAS ---
+
+        function getFirstClassDate(dayIndex) {
+            // Copiamos la fecha de inicio del semestre para no modificar la original
+            const targetDate = new Date(SEMESTER_START.getTime());
+            
+            // Convertir índices:
+            // Tu JSON (0=Lunes, ... 5=Sábado) -> JS Date (0=Domingo, 1=Lunes ... 6=Sábado)
+            const targetDayJS = dayIndex + 1; // Lunes es 1 en JS
+            
+            const startDayJS = SEMESTER_START.getDay(); // Día de la semana del 19 de Enero
+            
+            // Calcular cuántos días sumar para llegar al primer [Lunes/Martes/etc]
+            // Fórmula: (DíaDestino - DíaInicio + 7) % 7
+            let distance = (targetDayJS - startDayJS + 7) % 7;
+            
+            // Si la distancia es 0 (ej: el semestre empieza en lunes y la clase es lunes),
+            // la clase es ese mismo día.
+            
+            targetDate.setDate(SEMESTER_START.getDate() + distance);
+            return targetDate;
+        }
+
+        function formatICSDateTime(dateObj, minutesFromMidnight) {
+            const year = dateObj.getFullYear();
+            const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+            const day = dateObj.getDate().toString().padStart(2, '0');
+
+            const hours = Math.floor(minutesFromMidnight / 60).toString().padStart(2, '0');
+            const mins = (minutesFromMidnight % 60).toString().padStart(2, '0');
+
+            return `${year}${month}${day}T${hours}${mins}00`;
+        }
+
+    </script>
+    <div id="customTooltip" class="custom-tooltip">
+        <h4 id="tooltipTitle"></h4>
+        <p id="tooltipProf"></p>
+        <span id="tooltipTime"></span>
+    </div>
+</body>
+</html>

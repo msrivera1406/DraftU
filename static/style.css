@@ -1,0 +1,1281 @@
+/* style.css */
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #FFF7DF;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+.logo-img {
+    height: 60px; 
+    width: auto;
+    display: block;
+}
+/* Contenedor principal de la página */
+.header-nav {
+    display: flex;
+    justify-content: center; /* Centramos el nuevo contenedor */
+    align-items: center;
+    padding: 0; 
+    width: 100%;
+    height: 150px;
+    border-bottom: none; 
+
+    position: sticky; /* Se pega al scrollear */
+    top: 0;           /* Se pega al borde superior */
+    z-index: 1000;    /* Se asegura de estar encima de todo */
+    background-color: #FFF7DF; /* Importante: Fondo sólido para tapar lo de atrás */
+    transition: box-shadow 0.3s ease;
+}
+.nav-container {
+    display: flex;
+    justify-self: center;
+    align-items: center;
+    gap: 200px;
+    /* Centramos el contenido dentro de un ancho fijo */
+    width: fit-content;
+    max-width: 1200px; /* Define el ancho máximo del contenido */
+    
+    border-bottom: 2px solid #a0a0a0; /* Un gris medio, similar a tu diseño */
+    
+    padding-bottom: 20px; 
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.menu {
+    display: flex;
+    /* Mueve el menú a la derecha forzando la separación */
+    margin-left: 0; 
+    padding: 0;
+   
+    gap: 200px;
+    
+}
+/* Estilos del menú de navegación */
+.menu a {
+    color: #555;
+    text-decoration: none;
+    margin-left: 0;
+    font-size: 1.8rem;
+    font-weight: 300; /* ROBOTO THIN */
+    position: relative;
+    transition: color 0.3s;
+}
+.menu a::after {
+    content: ''; /* Contenido vacío necesario para que exista */
+    position: absolute;
+    width: 0; /* Empieza invisible (ancho 0) */
+    height: 1px; /* Grosor de la línea (fino como un trazo) */
+    bottom: -5px; /* Distancia debajo del texto */
+    left: 0;
+    
+    /* Color de la línea: Usamos un gris oscuro o el verde de tu marca. 
+       Probemos con el gris oscuro para simular grafito/lápiz */
+    background-color: #333; 
+    
+    /* La magia: Animación suave de 0.3 segundos */
+    transition: width 0.3s ease-in-out; 
+}
+.menu a:hover::after {
+    width: 100%; /* La línea se dibuja hasta el final */
+}
+.menu a:hover {
+    color: #000;
+}
+
+/* HERO SECTION - Contenido principal */
+.hero-section {
+    flex-grow: 1;
+    display: flex;
+    /* Ajuste: Alineación al centro para replicar el diseño */
+    align-items: flex-start; 
+    justify-content: space-between; 
+    width: 100%;
+    max-width: 1200px; /* Alineamos con el max-width del nav-container */
+    margin: 0 auto; /* Centramos la sección */
+    padding: 60px 40px 60px 40px; /* 60px arriba, 40px lados */
+    box-sizing: border-box;
+}
+.hero-image {
+    max-width: 900px;
+    
+    /* Usamos un margen negativo para tirar la imagen hacia el borde del viewport */
+    margin-left: -220px;
+}
+.hourglass-img {
+    width: 100%;
+    height: auto;
+}
+/* Contenedor de texto y botón */
+.hero-text {
+    max-width: 450px; 
+    text-align: right; 
+    /* Quitamos el margin-right extra */
+    margin-right: 140px;
+    
+}
+
+.hero-text h1 {
+    font-size: 4rem;
+    font-weight: 300; /* Roboto Light */
+    line-height: 1.3;
+    margin: 0 0 30px 0; /* Espacio debajo del título */
+}
+.thin-font {
+    font-weight: 100; /* Roboto Thin */
+    font-size: 2.5rem;
+    display: block; /* Asegura que "en segundos" vaya abajo si se necesita */
+    margin-top: 10px;
+
+    overflow: hidden; /* Oculta el texto que no ha salido */
+    white-space: nowrap; /* Mantiene todo en una línea */
+    border-right: 2px solid #5BA84F; /* El cursor (del color de tu botón) */
+    width: 0; /* Empieza en 0 ancho */
+    
+    /* Animación: typing dura 2s, blink-caret parpadea */
+    animation: 
+        typing 2s steps(20, end) forwards 0.5s,
+        blink-caret .75s step-end infinite;
+}
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% } /* Se expande al ancho del texto */
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: #5BA84F }
+}
+/* Botón CTA - El color verde de tu diseño */
+.cta-button {
+    display: inline-block;
+    padding: 15px 55px;
+    background-color: #5BA84F; /* Un verde suave/claro */
+    color: black;
+    text-decoration: none;
+    border-radius: 50px;
+    font-size: 1.5rem;
+    font-weight: 300;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: background-color 0.2s;
+    cursor: pointer;
+    position: relative;
+    z-index: 10;
+}
+
+.cta-button:hover {
+    background-color: #5a995a;
+    transform: translateY(-2px);
+}
+
+
+.features-section {
+    background-color: #2c2c2c; /* Gris oscuro casi negro */
+    color: white; /* Texto blanco */
+    padding: 20px 20px; /* Espacio interior arriba y abajo */
+    display: flex;
+    justify-content: center; /* Centrar las 3 columnas */
+    gap: 200px; /* Separación entre las columnas */
+    
+    
+}
+
+.feature-card {
+    text-align: center;
+    max-width: 250px;
+}
+
+.feature-card h3 {
+    font-size: 1.8rem;
+    font-weight: 300; /* Roboto Light */
+    margin-bottom: 20px;
+}
+
+.feature-card p {
+    font-size: 1.1rem;
+    font-weight: 300;
+    color: #ccc; /* Un blanco un poco apagado para el texto secundario */
+    line-height: 1.5;
+    margin-top: 20px;
+}
+
+/* EL CÍRCULO DEL ICONO */
+.icon-circle {
+    width: 120px;
+    height: 120px;
+    border: 2px solid white; /* Borde blanco fino */
+    border-radius: 50%; /* Lo hace perfectamente redondo */
+    margin: 0 auto; /* Centrado horizontal */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Efecto suave al pasar el mouse (opcional) */
+    transition: transform 0.3s ease, background-color 0.3s;
+}
+.icon-img {
+    width: 60px; /* Ajusta según el tamaño del icono */
+    height: 60px;
+}
+.feature-card:hover .icon-circle {
+    transform: scale(1.05); /* Crece un poquito al hover */
+    background-color: rgba(255,255,255,0.1);
+}
+
+/* --BUILDER-- */
+.builder-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden; /* Evitamos scroll en el body, lo manejamos dentro */
+}
+
+.header-simple {
+    display: flex;
+    padding: 0px 40px;
+    padding-top: 20px;
+    align-items: center;
+}
+
+.logo-small {
+    height: 50px;
+    width: auto;
+    margin-left: 10%;
+    margin-top: 10%;
+}
+
+/* ÁREA DE TRABAJO (Scroll Horizontal) */
+.board-canvas {
+    flex-grow: 1;
+    background-color: #FFF7DF; /* Tu color de fondo */
+    display: flex;
+    align-items: flex-start;; /* Centrar verticalmente */
+    padding-top: 40px;
+   
+    overflow-x: auto; /* SCROLL HORIZONTAL MÁGICO */
+    padding-right: 40px;
+    padding-left: 40px; 
+    padding-bottom: 20px; /* TRUCO: Padding gigante a los lados */          
+    /* Ocultar barra de scroll pero permitir scroll (Estético) */
+    scrollbar-width: thin;
+    scrollbar-color: #ddd transparent;
+}
+.cards-wrapper {
+    display: flex;
+    gap: 40px;
+    margin: auto; /* ESTO ES LA MAGIA: Centra el bloque horizontalmente */
+    padding: 20px 0; /* Un poco de aire vertical para las sombras */
+    min-width: min-content; /* Asegura que no se aplaste */
+}
+
+
+
+/* COLUMNA (Materia) */
+.column {
+    min-width: 320px; /* Ancho fijo de cada tarjeta/columna */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    /* Si la columna crece mucho verticalmente, scrollear dentro de ella */
+    max-height: 60vh; 
+    overflow-y: auto;
+    animation: fadeIn 0.3s ease-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* TARJETAS PLACEHOLDER (Las punteadas) */
+.card-dashed {
+    border: 2px dashed #ccc;
+    border-radius: 20px;
+    padding: 30px 20px;
+    text-align: center;
+    color: #aaa;
+    cursor: pointer;
+    transition: all 0.2s;
+    background-color: rgba(255,255,255,0.3);
+}
+
+.card-dashed:hover {
+    border-color: #aaa;
+    background-color: rgba(255,255,255,0.6);
+
+}
+
+.plus-icon {
+    font-size: 2rem;
+    font-weight: 100;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.card-text {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+    font-size: 1rem;
+}
+
+.bottom-bar {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    background-color: #FFF7DF; /* El mismo fondo para que parezca flotante */
+    /* Opcional: sombra sutil hacia arriba */
+    box-shadow: 0 -10px 20px rgba(0,0,0,0.02); 
+}
+
+.generate-btn {
+    background-color: #FFAD4D; /* Tu color naranja */
+    color: #333;
+    border: none;
+    padding: 15px 60px;
+    font-size: 1.2rem;
+    font-weight: 400;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(255, 173, 77, 0.4);
+    transition: transform 0.2s;
+}
+.generate-btn:hover {
+    transform: translateY(-2px);
+}
+
+
+.intro-text {
+    text-align: center;
+    padding: 0px 0;
+    flex-shrink: 0;
+}
+.intro-text h2 {
+    font-weight: 400;
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 2rem;
+}
+.intro-text p {
+    font-weight: 300;
+    color: #666;
+    margin: 0;
+}
+
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro semitransparente */
+    display: none; /* Oculto por defecto */
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(5px); /* Efecto borroso moderno */
+}
+
+/* Cuando le ponemos la clase 'active' con JS, se muestra */
+.modal-overlay.active {
+    display: flex;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-card {
+    background-color: #FFF7DF;
+    padding: 30px;
+    border-radius: 20px;
+    width: 400px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.modal-card h3 {
+    margin-top: 0;
+    font-weight: 400; /* Roboto Regular */
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.modal-input {
+    width: 100%;
+    padding: 15px;
+    margin: 20px 0;
+    border: 2px solid #ddd; /* Borde suave */
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: 'Roboto', sans-serif;
+    outline: none;
+    transition: border-color 0.3s;
+    box-sizing: border-box; /* Para que el padding no rompa el ancho */
+}
+
+.modal-input:focus {
+    border-color: #FFAD4D; /* Color naranja al escribir */
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.btn-cancel, .btn-confirm {
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    flex-grow: 1;
+    font-family: 'Roboto', sans-serif;
+}
+
+.btn-cancel {
+    background-color: transparent;
+    color: #666;
+    border: 1px solid #ccc;
+}
+
+.btn-confirm {
+    background-color: #333;
+    color: white;
+}
+
+.btn-confirm:hover {
+    background-color: #000;
+}
+.subject-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 20px 50px 20px 20px;
+    border-radius: 20px; /* Bordes más redondeados */
+    text-align: center;
+    position: relative;
+    margin-bottom: 20px; /* Espacio antes de las tarjetas punteadas */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* Sombra suave */
+    min-height: 40px; 
+    
+}
+
+.subject-header h3 {
+    margin: 0;
+    font-weight: 500; /* Roboto Medium */
+    color: #333;
+    font-size: 1.1rem;
+    text-transform: uppercase; /* Opcional: Para que se vea como en tu diseño */
+    letter-spacing: 0.5px;
+   
+    flex-grow: 1; 
+    text-align: center;
+    
+    /* Seguridad para textos largos */
+    word-break: break-word; 
+    line-height: 1.2;
+}
+
+/* El Ícono del Basurero */
+.delete-btn {
+    /* Quitamos position: absolute y transform */
+    position: relative; 
+    transform: none; 
+    top: auto; 
+    right: auto;
+    
+    /* Dimensiones fijas */
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 50%;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #999;
+    
+    /* VITAL: Evita que se aplaste si el texto es largo */
+    flex-shrink: 0;
+}
+.delete-btn i {
+    font-size: 14px; /* Tamaño controlado */
+    line-height: 1;  /* Elimina el interlineado que lo descuadra */
+    margin: 0;       /* Asegura que no tenga márgenes */
+    padding: 0;
+}
+.delete-btn:hover {
+    color: #e74c3c; /* Rojo al pasar el mouse */
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Contenedor de filas de tiempo */
+.time-blocks-container {
+    max-height: 200px;
+    overflow-y: auto; /* Scroll si hay muchos horarios */
+    margin-bottom: 15px;
+    padding-right: 5px;
+}
+
+/* Una fila individual de tiempo */
+.time-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: center;
+    animation: fadeIn 0.2s;
+}
+
+/* Select de Días e Inputs de Hora */
+.input-day, .input-time {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: 'Roboto', sans-serif;
+    outline: none;
+    background: white;
+}
+
+.input-day {
+    flex: 2; /* El día ocupa más espacio */
+}
+
+.input-time {
+    flex: 1.5; /* Las horas ocupan menos */
+}
+
+/* Botón sutil para borrar una fila de tiempo */
+.btn-remove-row {
+    color: #ff6b6b;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    padding: 5px;
+}
+.btn-remove-row:hover {
+    transform: scale(1.1);
+}
+
+/* Botón para agregar nueva fila */
+.btn-add-time {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px dashed #ccc;
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'Roboto', sans-serif;
+    transition: all 0.2s;
+}
+.btn-add-time:hover {
+    background-color: #e0e0e0;
+    border-color: #999;
+}
+
+/* Estilo de la Tarjeta de Grupo (Ya creada en la columna) */
+.group-card {
+    background-color: rgba(255,255,255,0.7);
+    border-radius: 15px;
+    padding: 15px;
+    margin-bottom: 0;
+    text-align: left;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    position: relative;
+}
+.group-card:hover {
+    background-color: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+.group-prof {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 5px;
+}
+.group-schedule {
+    font-size: 0.85rem;
+    color: #666;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+.schedule-badge {
+    background-color: #eee;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+.accordion-toggle {
+    width: 32px; 
+    height: 32px;
+    background: rgba(255,255,255,0.4);
+    border-radius: 50%;
+    
+    display: none; /* Oculto en escritorio por defecto */
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s;
+    cursor: pointer;
+    
+    /* VITAL: Evita que se aplaste */
+    flex-shrink: 0;
+}
+
+
+/* 1. EL FONDO (Overlay) */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco semitransparente */
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 3000; /* Encima de todo */
+}
+
+/* Clase para activarlo */
+.loading-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+/* 2. CONTENEDOR DEL RELOJ */
+.hourglass-animation-box {
+    position: relative;
+    width: 300px; /* Ajusta al tamaño visual de tu reloj */
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hourglass-static {
+    width: 100%;
+    height: auto;
+    position: relative;
+    z-index: 10; /* La imagen está "encima" o detrás según el efecto deseado */
+}
+
+.hourglass-animation-box {
+    position: relative;
+    width: 300px; 
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* El círculo que late */
+.pulse-circle {
+    position: absolute;
+    width: 150px;  /* Empieza pequeño detrás del reloj */
+    height: 150px;
+    background-color: rgba(91, 168, 79, 0.2); /* Tu verde con transparencia */
+    border-radius: 50%;
+    z-index: 1; /* Detrás de la imagen */
+    
+    /* La animación */
+    animation: pulseEffect 2s infinite ease-in-out;
+}
+
+/* Imagen del reloj */
+.hourglass-static {
+    width: 100%;
+    height: auto;
+    position: relative;
+    z-index: 2; /* Encima del círculo */
+}
+
+@keyframes pulseEffect {
+    0% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scale(1.5); /* Crece bastante */
+        opacity: 0.1; /* Se desvanece */
+    }
+    100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+}
+
+
+/* 5. TEXTO */
+.loading-text-container {
+    text-align: center;
+    margin-top: -40px; /* Subirlo un poco */
+    z-index: 20;
+}
+
+
+.loading-title {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+    font-size: 2rem;
+    color: #333;
+    min-width: 300px; /* Para que no baile el ancho al cambiar texto */
+}
+
+
+/* static/style.css - RESULTADOS Y CALENDARIO */
+
+/* Encabezado de Navegación */
+.results-header {
+    text-align: center;
+    padding: 10px 0;
+}
+.results-header h2 {
+    font-weight: 400;
+    margin: 0 0 15px 0;
+    font-size: 1.5rem;
+}
+
+.navigation-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav-arrow {
+    background: white;
+    border: 1px solid #ddd;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #555;
+}
+.nav-arrow:hover {
+    background-color: #eee;
+    transform: scale(1.1);
+}
+
+.option-counter {
+    font-size: 1.2rem;
+    font-weight: 300;
+    min-width: 100px;
+    text-align: center;
+}
+
+/* --- EL GRID DEL CALENDARIO --- */
+.schedule-container {
+    flex-grow: 1; /* Ocupar espacio restante */
+    max-width: 1200px;
+    width: 95%;
+    margin: 10px auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Para respetar el radius */
+    height: 600px; /* ALTURA FIJA PARA PERMITIR SCROLL INTERNO */
+    position: relative;
+    border: 1px solid #eee; /* NUEVO */
+}
+
+/* 1. Cabecera de Días (STICKY) */
+.days-header {
+    display: flex;
+    background-color: #FFFDF5; /* Un crema muy suave */
+    border-bottom: 1px solid #eee;
+    
+    z-index: 20;
+    flex-shrink: 0; /* No encogerse */
+    padding-right: 15px;/*NUEVO*/
+}
+
+.time-corner {
+    width: 60px; /* Ancho de la columna de hora */
+    flex-shrink: 0;
+    border-right: 1px solid #eee;
+}
+
+.day-label {
+    flex: 1; /* Todos los días del mismo ancho */
+    text-align: center;
+    padding: 15px 0;
+    font-weight: 500;
+    color: #666;
+    font-size: 0.9rem;
+    border-right: 1px solid #f9f9f9;
+}
+
+/* 2. Cuerpo Scrolleable */
+.scrollable-grid {
+    display: flex;
+    overflow-y: scroll; /* AQUÍ ESTÁ EL SCROLL VERTICAL */
+    flex-grow: 1;
+    position: relative;
+}
+
+/* Columna de Horas */
+.time-column {
+    width: 60px;
+    flex-shrink: 0;
+    background-color: #fafafa;
+    border-right: 1px solid #eee;
+
+    background-size: 100% 40px; 
+    background-image: linear-gradient(to bottom, #eee 1px, transparent 1px);
+}
+
+.time-label {
+    /* Height se define en JS (40px) */
+    height: 40px; 
+    font-size: 0.75rem;
+    color: #999;
+    text-align: center;
+    
+    /* Centramos el texto verticalmente dentro de su bloque de hora */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Grid de Días */
+.days-grid {
+    display: flex;
+    flex: 1;
+    position: relative;
+    /* Fondo con líneas guía (Opcional, truco avanzado de gradiente) */
+    background-size: 100% 40px; /* Repetir cada hora */
+    background-image: linear-gradient(to bottom, #f9f9f9 1px, transparent 1px);
+}
+
+.day-column {
+    flex: 1;
+    position: relative; /* Para que los bloques absolutos se posicionen respecto a esto */
+    border-right: 1px solid #f9f9f9;
+}
+
+/* BLOQUE DE CLASE (La tarjeta de color) */
+.class-block {
+    position: absolute; /* Clave para posicionamiento exacto */
+    left: 4px;
+    right: 4px; /* Dejar un margen pequeño a los lados */
+    border-radius: 8px;
+    padding: 5px;
+    box-sizing: border-box;
+    overflow: hidden;
+    font-size: 0.8rem;
+    color: #444;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    cursor: pointer;
+
+    display: flex;
+    flex-direction: column;
+    padding-top: 10px;
+}
+
+.class-block:hover {
+    z-index: 50;
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+.block-title {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
+}
+.block-prof {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.block-time {
+    font-size: 0.7rem;
+    margin-top: 2px;
+    font-weight: 300;
+}
+
+.custom-tooltip {
+    position: fixed; /* Se mueve con el mouse respecto a la pantalla */
+    display: none;   /* Oculto por defecto */
+    background-color: white;
+    padding: 12px 15px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2); /* Sombra elegante */
+    z-index: 9999; /* Siempre encima de todo */
+    pointer-events: none; /* MAGIA: El mouse lo ignora, así no parpadea */
+    border: 1px solid #eee;
+    min-width: 150px;
+    max-width: 250px;
+}
+
+.custom-tooltip h4 {
+    margin: 0 0 5px 0;
+    font-size: 0.9rem;
+    color: #333;
+    font-weight: 500;
+}
+
+.custom-tooltip p {
+    margin: 0 0 5px 0;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.custom-tooltip span {
+    font-size: 0.8rem;
+    color: #999;
+    font-weight: 300;
+    background-color: #f5f5f5;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.corner-expand-btn {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #bbb;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+}
+.corner-expand-btn:hover {
+    color: #555;
+    background-color: #f0f0f0;
+}
+
+
+/* --- ESTADO EXPANDIDO (La magia) --- */
+.schedule-container.expanded-mode {
+    /* Romper las cadenas del layout */
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100vw;  /* 100% del ancho de ventana */
+    height: 100vh; /* 100% del alto de ventana */
+    max-width: none;
+    margin: 0;
+    border-radius: 0;
+    z-index: 5000; /* Encima de todo, incluso del header */
+    background-color: white;
+    
+    /* Configuración para que se vea todo */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ajuste del cuerpo en modo expandido */
+.schedule-container.expanded-mode .scrollable-grid {
+    overflow-y: auto; /* Permitir scroll si la pantalla es muy chica */
+    flex-grow: 1;
+    /* Opcional: Si quieres ver todo sin scroll, usa zoom o ajusta height */
+}
+
+/* Ajuste del Header en modo expandido */
+.schedule-container.expanded-mode .days-header {
+    background-color: #f9f9f9; /* Diferenciarlo un poco */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+
+
+@media screen and (max-width: 768px) {
+
+    /* --- 1. NAVBAR (Compacta y Apilada) --- */
+    .header-nav {
+        height: auto; /* Dejamos que crezca según el contenido */
+        padding: 10px 0; /* Un poco de aire arriba y abajo */
+    }
+
+    .nav-container {
+        flex-direction: column; /* Apilar Logo y Menú */
+        gap: 20px; /* Reducir el espacio gigante de 100px a 20px */
+        padding-bottom: 15px; /* Reducir padding de la línea */
+        width: 80%; /* Que la línea no toque los bordes de la pantalla */
+    }
+
+    .logo-img {
+        height: 40px; /* Un poco más pequeño */
+    }
+
+    .menu {
+        gap: 40px; /* Reducir espacio entre enlaces */
+        width: 100%;
+        justify-content: center; /* Centrar los enlaces */
+    }
+
+    .menu a {
+        font-size: 1.2rem; /* Texto más pequeño para móvil */
+    }
+
+
+    /* --- 2. HERO SECTION (Centrada y Vertical) --- */
+    .hero-section {
+        flex-direction: column; /* Imagen arriba, texto abajo */
+        align-items: center; /* Centrar todo horizontalmente */
+        justify-content: center;
+        padding: 40px 20px 80px 20px; /* Ajustar paddings */
+        margin-top: 20px;
+    }
+
+    .hero-image {
+        /* Resetear los márgenes locos del escritorio */
+        margin-left: 0; 
+        max-width: 350px; /* Hacer el reloj más pequeño para que quepa */
+        margin-bottom: 20px; /* Separación entre reloj y texto */
+    }
+
+    .hero-text {
+        text-align: center; /* Texto centrado */
+        max-width: 100%;
+        margin-top: 0; /* Quitar el empuje hacia abajo del escritorio */
+        margin-right: 0;
+    }
+
+    .hero-text h1 {
+        font-size: 2.5rem; /* Título más pequeño */
+    }
+    
+    .thin-font {
+        font-size: 1.8rem; /* Subtítulo más pequeño */
+    }
+
+
+    /* --- 3. FEATURES SECTION (Columna) --- */
+    .features-section {
+        flex-direction: column; /* Apilar las 3 características */
+        align-items: center;
+        gap: 60px; /* Espacio entre cada tarjeta */
+        padding: 60px 20px;
+    }
+
+    .feature-card {
+        max-width: 100%; /* Aprovechar el ancho */
+    }
+
+/* 1. HEADER Y TÍTULOS */
+    .header-simple {
+        justify-content: center; /* Centrar logo */
+        padding: 15px;
+    }
+    .logo-small {
+        margin: 0; /* Quitar márgenes raros */
+        height: 40px;
+    }
+    .intro-text {
+        padding: 10px 20px;
+    }
+    .intro-text h2 {
+        font-size: 1.5rem; /* Título más pequeño */
+    }
+    .intro-text p {
+        font-size: 0.9rem;
+    }
+
+    /* 2. TABLERO VERTICAL (Adiós Scroll Horizontal) */
+    .board-canvas {
+        flex-direction: column; /* Apilar hacia abajo */
+        align-items: stretch; /* Ocupar todo el ancho */
+        padding: 20px; /* Padding normal */
+        overflow-x: hidden; /* Bloquear scroll lateral */
+        height: auto; /* Dejar crecer */
+    }
+
+    .cards-wrapper {
+        flex-direction: column; /* Columnas una debajo de otra */
+        width: 100%;
+        gap: 20px;
+        margin: 0;
+    }
+
+    .column {
+        min-width: 0; /* Resetear ancho mínimo */
+        width: 100%;  /* Ocupar todo el ancho del cel */
+        max-height: none; /* Quitar límite de altura */
+        overflow: visible;
+        
+        /* Estilo tipo "Acordeón Cerrado" por defecto */
+        background: rgba(255,255,255,0.5);
+        border-radius: 20px;
+        transition: all 0.3s ease;
+    }
+
+    /* 3. LOGICA DE ACORDEÓN (CSS) */
+    /* Cuando la columna NO tiene la clase 'expanded', ocultamos el contenido */
+    .column:not(.expanded) .group-card,
+    .column:not(.expanded) .card-dashed {
+        display: none;
+    }
+    
+    /* Ajuste del Header en Móvil */
+    .subject-header {
+        margin-bottom: 0; /* Pegadito si está cerrado */
+        justify-content: space-between; /* Título a la izq, controles a la der */
+        padding: 15px 20px;
+    }
+    
+    /* Si está expandido, le damos margen abajo al header */
+    .column.expanded .subject-header {
+        margin-bottom: 15px;
+        border-bottom-left-radius: 0; 
+        border-bottom-right-radius: 0; 
+    }
+    
+    /* Botón Chevron (Flecha) que solo aparece en móvil */
+    .accordion-toggle {
+        display: flex;
+    }
+    
+    /* Rotar la flecha si está expandido */
+    .column.expanded .accordion-toggle {
+        transform: rotate(180deg);
+        background: white;
+    }
+
+
+    /* 4. MODALES RESPONSIVAS (Más pequeñas) */
+    .modal-card {
+        width: 90% !important; /* Ocupar casi toda la pantalla */
+        padding: 20px;
+        max-height: 90vh; /* Evitar que se salga por arriba/abajo */
+        overflow-y: auto; /* Scroll interno si es muy alto */
+    }
+
+    /* 5. FORMULARIO DE HORARIOS (Rediseño total) */
+    .time-row {
+        flex-wrap: wrap; /* Permitir que los elementos bajen */
+        background: #f9f9f9;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #eee;
+    }
+
+    .input-day {
+        width: 100%; /* El día ocupa toda la fila superior */
+        margin-bottom: 10px;
+        flex: none;
+    }
+
+    .input-time {
+        width: 40%; /* Inputs de hora comparten fila */
+        flex: 1;
+    }
+
+    .btn-remove-row {
+        width: 100%; /* Botón de borrar abajo del todo */
+        margin-top: 5px;
+        border-top: 1px solid #eee;
+        padding-top: 5px;
+        color: #ff6b6b;
+    }
+    #addSubjectColumn {
+        /* 1. Empujarlo hacia abajo para despegarl del acordeón */
+        margin-top: 10px !important; 
+        
+        
+        /* 3. Necesario para posicionar la línea divisoria */
+        position: relative; 
+    }
+
+    
+    /* OPCIONAL: Si quieres reducir un poco la opacidad para que se vea "inactivo" */
+    #addSubjectColumn .card-dashed {
+        border-color: #ddd; /* Borde más suave */
+    }
+    .loading-title {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+    font-size: 1.5rem;
+    color: #333;
+    min-width: 300px; 
+    }
+
+    .schedule-container {
+        height: 70vh; /* Ocupar más pantalla en móvil */
+    }
+    
+    /* En móvil, quizás quieras scroll horizontal si son muchos días, 
+       pero por ahora comprimimos las columnas */
+    
+
+    
+    .day-label {
+        min-width: 0;
+        overflow: hidden;
+        font-size: 0.7rem;
+        padding: 10px 0;
+        /* Quitamos padding lateral para ganar espacio */
+    }
+    .day-column{
+        min-width: 0; 
+        overflow: visible;
+    }
+    .days-header {
+        padding-right: 0; 
+    }
+
+    /* --- ARREGLO 2: BOTONES DE ACCIÓN --- */
+    .bottom-bar {
+        /* Apilar botones verticalmente */
+        flex-direction: column; 
+        gap: 15px; /* Espacio entre ellos */
+        padding: 20px;
+    }
+
+    .generate-btn {
+        width: 100%; /* Ocupar todo el ancho */
+        padding: 12px 0; /* Menos "gordos" (altura) */
+        font-size: 1rem; /* Texto legible pero no gigante */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box; /* Para que el padding no rompa el ancho */
+    }
+
+    /* Ajustes generales del calendario en móvil */
+    .schedule-container {
+        height: 65vh; 
+        width: 100%;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        margin: 0;
+    }
+    
+    .time-label {
+        font-size: 0.6rem;
+    }
+    
+    .block-title {
+        font-size: 0.65rem;
+    }
+    
+    /* Ocultar info secundaria en bloques muy chicos */
+    .block-prof, .block-time {
+        display: none; 
+    }
+
+
+}

@@ -1,0 +1,24 @@
+# --- Basura de Python ---
+__pycache__/
+venv/
+*.pyc
+
+# --- Basura de C++ y Compilación ---
+*.exe
+*.o
+*.obj
+*.dll
+
+# --- Basura de Visual Studio (Muy importante ignorar esto) ---
+.vs/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+Debug/
+Release/
+x64/
+
+# --- Archivos temporales de datos (Se generan al usar la app) ---
+input.json
+output.json
