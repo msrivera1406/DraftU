@@ -1,5 +1,10 @@
 /* style.css */
 
+html, body {
+    width: 100%;
+    overflow-x: hidden; /* Prohíbe terminantemente el scroll horizontal en la página */
+    position: relative; /* Ayuda a contener elementos absolutos */
+}
 body {
     font-family: 'Roboto', sans-serif;
     background-color: #FFF7DF;
@@ -453,7 +458,7 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: 15px;
-    padding: 20px 50px 20px 20px;
+    padding: 15px 20px;
     border-radius: 20px; /* Bordes más redondeados */
     text-align: center;
     position: relative;
@@ -1046,11 +1051,97 @@ body {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.2); }
 }
+.visibility-btn {
+    cursor: pointer;
+    color: #999;
+    font-size: 1rem;
+    padding: 5px;
+    transition: all 0.2s;
+    /* Lo ponemos flexible para que no rompa el layout */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.visibility-btn:hover {
+    color: #333;
+    transform: scale(1.1);
+}
 
+/* ESTADO INACTIVO (Fantasma) */
+.inactive-item {
+    opacity: 0.5; /* Se ve medio transparente */
+    filter: grayscale(100%); /* Le quitamos el color */
+    transition: all 0.3s ease;
+}
 
+/* Opcional: Cuando pasas el mouse por algo inactivo, que se vea un poco mejor */
+.inactive-item:hover {
+    opacity: 0.8;
+}
 
+.header-eye-btn {
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.6); /* Misma transparencia que el basurero */
+    border-radius: 50%;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #999;
+    
+    /* VITAL: El mismo tamaño de ícono que el basurero */
+    font-size: 14px; 
+}
+.header-eye-btn:hover {
+    background: white;
+    color: #333;
+    transform: scale(1.1);
+}
+
+.group-controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 5px; /* Espacio entre el ojo y la X */
+    align-items: center;
+}
+
+/* Estilo unificado para Ojo y X dentro del grupo */
+.group-icon-btn {
+    width: 24px;  /* Ancho fijo */
+    height: 24px; /* Alto fijo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #ccc;
+    border-radius: 4px; /* Un poquito cuadrado pero suave */
+    transition: all 0.2s;
+    font-size: 0.9rem; /* Tamaño del dibujo */
+}
+
+/* Efectos Hover individuales */
+.group-icon-btn:hover {
+    background-color: rgba(0,0,0,0.05); /* Sombra suave */
+    color: #666;
+}
+
+/* El basurero (X) se pone rojo al hover */
+.group-icon-btn.delete-group:hover {
+    color: #ff6b6b;
+    background-color: rgba(255, 107, 107, 0.1);
+}
 
 @media screen and (max-width: 768px) {
+    * {
+        box-sizing: border-box; /* Vital para que el padding no rompa el ancho */
+        margin: 0;
+        padding: 0;
+    }
     .main-footer {
         padding: 15px 20px;
         margin-bottom: 0; /* Asegurar que se vea al final */

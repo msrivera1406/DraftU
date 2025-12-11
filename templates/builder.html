@@ -94,48 +94,64 @@
             closeModal('subjectModal');
         }
         function renderBoard() {
-        // --- DEBUG: VERIFICAR JSON EN CONSOLA ---
-            console.clear(); // Limpia la consola para no confundirte
-            console.log("📦 ESTADO ACTUAL DEL JSON:");
-            console.log(JSON.stringify(subjectsData, null, 4)); // El '4' es para que se vea bonito y ordenado
-        // ----------------------------------------
+            saveCatalog(); // Guardamos cambios por si acaso
+            
             const wrapper = document.getElementById('cardsWrapper');
             wrapper.innerHTML = ''; 
 
             subjectsData.forEach((subject, index) => {
+                // --- 1. DETECTAR SI LA MATERIA ESTÁ ACTIVA ---
+                // Si no existe la propiedad (backwards compatibility), asumimos true
+                const isSubActive = subject.active !== false; 
+                const subOpacityClass = isSubActive ? '' : 'inactive-item';
+                const subEyeIcon = isSubActive ? 'fa-eye' : 'fa-eye-slash';
+                
+                // Colores: Si está inactiva, el header se verá gris por el filtro CSS
                 const colors = ['#FFD1DC', '#D1E8FF', '#E8D1FF', '#D1FFD6']; 
                 const bgColor = colors[index % colors.length];
 
-                // --- 1. NUEVO: GENERAR HTML DE LOS GRUPOS (PROFESORES) ---
                 let groupsHTML = '';
                 
                 if (subject.groups && subject.groups.length > 0) {
                     subject.groups.forEach(group => {
-                        // Generar las etiquetas de horario (Ej: LUN 07:00-09:00)
+                        // --- 2. DETECTAR SI EL GRUPO ESTÁ ACTIVO ---
+                        const isGroupActive = group.active !== false;
+                        const groupOpacityClass = isGroupActive ? '' : 'inactive-item';
+                        const groupEyeIcon = isGroupActive ? 'fa-eye' : 'fa-eye-slash';
+
                         let timeBadges = '';
                         group.schedules.forEach(sch => {
                             timeBadges += `<span class="schedule-badge">${sch.dayName} ${sch.start}-${sch.end}</span>`;
                         });
 
-                        // Crear la tarjeta del grupo
                         groupsHTML += `
-                            <div class="group-card">
+                            <div class="group-card ${groupOpacityClass}">
                                 <div class="group-prof">Prof. ${group.professor}</div>
                                 <div class="group-schedule">
                                     ${timeBadges}
                                 </div>
-                                <i class="fa-solid fa-xmark" 
-                                style="position:absolute; top:10px; right:10px; cursor:pointer; color:#999;"
-                                onclick="removeGroup(${subject.id}, ${group.id})"></i>
+                                
+                                <div class="group-controls">
+                                    <div class="group-icon-btn" 
+                                        onclick="toggleGroupActive(${subject.id}, ${group.id})"
+                                        title="${isGroupActive ? 'Ocultar profesor' : 'Mostrar profesor'}">
+                                        <i class="fa-solid ${groupEyeIcon}"></i>
+                                    </div>
+                                    
+                                    <div class="group-icon-btn delete-group" 
+                                        onclick="removeGroup(${subject.id}, ${group.id})"
+                                        title="Eliminar profesor">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </div>
+                                </div>
                             </div>
                         `;
                     });
                 }
-                // ----------------------------------------------------------
 
                 const columnHTML = `
-                    <div class="column expanded" id="col-${subject.id}">
-        
+                    <div class="column expanded ${subOpacityClass}" id="col-${subject.id}">
+                        
                         <div class="subject-header" style="background-color: ${bgColor};">
                             
                             <div class="delete-btn" onclick="event.stopPropagation(); openDeleteModal(${subject.id})" title="Eliminar materia">
@@ -144,13 +160,20 @@
 
                             <h3>${subject.name}</h3>
 
-                            <div class="accordion-toggle" onclick="toggleAccordion(${subject.id})">
-                                <i class="fa-solid fa-chevron-down"></i>
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                
+                                <div class="header-eye-btn" 
+                                    onclick="toggleSubjectActive(${subject.id})"
+                                    title="${isSubActive ? 'Ocultar materia temporalmente' : 'Reactivar materia'}">
+                                    <i class="fa-solid ${subEyeIcon}"></i>
+                                </div>
+
+                                <div class="accordion-toggle" onclick="toggleAccordion(${subject.id})">
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </div>
                             </div>
 
-                        </div>                
-
-
+                        </div>
 
                         ${groupsHTML}
 
@@ -162,14 +185,12 @@
                 wrapper.innerHTML += columnHTML;
             });
 
-            // Columna de "Agregar Materia" (Se queda igual)
+            // Columna de "Agregar Materia" (Sin cambios)
             const addColumnHTML = `
                 <div class="column expanded" id="addSubjectColumn">
                     <div class="card-dashed" onclick="openAddSubjectModal()">
                         <div class="card-text">Agregar materia</div>
                     </div>
-                
-                    
                 </div>
             `;
             wrapper.innerHTML += addColumnHTML;
@@ -291,8 +312,24 @@
 
         async function submitData() {
             // 1. Validar que haya datos
-            if (subjectsData.length === 0) {
-                alert("Agrega al menos una materia.");
+            const activePayload = subjectsData
+                    // A. Filtrar materias ocultas
+                    .filter(sub => sub.active !== false) 
+                    .map(sub => {
+                        // B. Crear copia de la materia
+                        return {
+                            ...sub,
+                            // C. Filtrar grupos ocultos dentro de la materia
+                            groups: sub.groups.filter(g => g.active !== false)
+                        };
+                    })
+                    // D. Seguridad: Si una materia se quedó sin grupos visibles, la quitamos también
+                    // (Porque el algoritmo fallaría si le mandas una materia vacía)
+                    .filter(sub => sub.groups.length > 0);
+
+            // Validar sobre los datos FILTRADOS
+            if (activePayload.length === 0) {
+                alert("No hay materias activas para generar horario. Activa alguna.");
                 return;
             }
 
@@ -305,7 +342,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(subjectsData)
+                    body: JSON.stringify(activePayload)
                 });
 
                 const result = await response.json();
@@ -389,6 +426,28 @@
         window.addEventListener('load', () => {
             loadCatalog();
         });
+        function toggleSubjectActive(subjectId) {
+            const subject = subjectsData.find(s => s.id === subjectId);
+            if (subject) {
+                // Si no existe la propiedad, asumimos true y la invertimos a false
+                if (subject.active === undefined) subject.active = true;
+                subject.active = !subject.active;
+                renderBoard(); // Repintar
+            }
+        }
+
+        // Toggle Grupo Específico
+        function toggleGroupActive(subjectId, groupId) {
+            const subject = subjectsData.find(s => s.id === subjectId);
+            if (subject) {
+                const group = subject.groups.find(g => g.id === groupId);
+                if (group) {
+                    if (group.active === undefined) group.active = true;
+                    group.active = !group.active;
+                    renderBoard(); // Repintar
+                }
+            }
+        }
 
     </script>
     {% include 'loading.html' %}
