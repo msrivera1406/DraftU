@@ -46,25 +46,54 @@
         let subjectsData = [];
         let idToDelete = null;
         let currentSubjectId = null;
+        let editingGroupId = null;
         const DAYS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
         function openAddSubjectModal() {
             document.getElementById('subjectModal').classList.add('active');
             document.getElementById('subjectNameInput').focus(); // Pone el cursor directo para escribir
         }
-        function openGroupModal(subjectId) {
-            currentSubjectId = subjectId; // Guardamos el ID de la materia
-    
-            // Limpiamos inputs anteriores
-            document.getElementById('profNameInput').value = '';
-            document.getElementById('timeBlocksContainer').innerHTML = '';
-    
-            // Agregamos una fila vacía por defecto para empezar rápido
-            addTimeRow();
-    
+        function openGroupModal(subjectId, groupId = null) {
+            currentSubjectId = subjectId;
+            editingGroupId = groupId; // Guardamos el ID (puede ser null o un número)
+            
+            const modalTitle = document.querySelector('#groupModal h3');
+            const inputName = document.getElementById('profName');
+            const container = document.getElementById('timeBlocksContainer');
+            const btnSave = document.getElementById('btnSaveGroup');
+
+            // Limpiar formulario previo
+            container.innerHTML = ''; 
+            inputName.value = '';
+
+            if (groupId === null) {
+                // MODO CREAR
+                modalTitle.innerText = "Nuevo Grupo";
+                btnSave.innerText = "Guardar Grupo";
+                addTimeRow(); // Añadir una fila vacía
+            } else {
+                // MODO EDITAR
+                modalTitle.innerText = "Editar Grupo";
+                btnSave.innerText = "Actualizar Grupo";
+
+                // 1. Buscar los datos existentes
+                const subject = subjectsData.find(s => s.id === subjectId);
+                const group = subject.groups.find(g => g.id === groupId);
+
+                // 2. Rellenar Nombre
+                inputName.value = group.professor;
+
+                // 3. Rellenar Horarios
+                group.schedules.forEach(sch => {
+                    // Convertimos formato "HH:MM" a inputs
+                    // sch.day es 0-5
+                    addTimeRow(sch.day, sch.start, sch.end);
+                });
+            }
+
             document.getElementById('groupModal').classList.add('active');
-            document.getElementById('profNameInput').focus();
         }
+
         function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('active');
             // Limpiar inputs
@@ -136,6 +165,12 @@
                                         onclick="toggleGroupActive(${subject.id}, ${group.id})"
                                         title="${isGroupActive ? 'Ocultar profesor' : 'Mostrar profesor'}">
                                         <i class="fa-solid ${groupEyeIcon}"></i>
+                                    </div>
+                                    
+                                    <div class="group-icon-btn edit-group" 
+                                        onclick="openGroupModal(${subject.id}, ${group.id})"
+                                        title="Editar información">
+                                        <i class="fa-solid fa-pen"></i>
                                     </div>
                                     
                                     <div class="group-icon-btn delete-group" 
@@ -212,40 +247,40 @@
                 idToDelete = null;
             }
         }
-        function addTimeRow() {
+        // 2. AGREGAR FILA DE HORARIO
+        function addTimeRow(savedDay = null, savedStart = null, savedEnd = null) {
             const container = document.getElementById('timeBlocksContainer');
             
-            // --- VARIABLES POR DEFECTO ---
-            let prevStart = '';
-            let prevEnd = '';
-            let prevDay = '0'; 
-            
-            // --- INTELIGENCIA: COPIAR DEL ÚLTIMO BLOQUE ---
-            const existingRows = container.getElementsByClassName('time-row');
-            
-            if (existingRows.length > 0) {
-                // Obtenemos SIEMPRE la última fila visual
-                const lastRow = existingRows[existingRows.length - 1];
-                
-                // 1. Copiar Horas
-                const inputs = lastRow.querySelectorAll('.input-time');
-                if (inputs.length >= 2) {
-                    prevStart = inputs[0].value;
-                    prevEnd = inputs[1].value;
-                }
+            // VARIABLES POR DEFECTO (Para nueva fila manual)
+            let defaultStart = '';
+            let defaultEnd = '';
+            let defaultDay = '0'; 
 
-                // 2. Copiar Día (NUEVO)
-                const daySelect = lastRow.querySelector('.input-day');
-                if (daySelect) {
-                    prevDay = daySelect.value;
+            // SI NO NOS PASAN DATOS (Es manual), INTENTAMOS COPIAR DEL ANTERIOR
+            if (savedDay === null) {
+                const existingRows = container.getElementsByClassName('time-row');
+                if (existingRows.length > 0) {
+                    const lastRow = existingRows[existingRows.length - 1];
+                    
+                    const inputs = lastRow.querySelectorAll('.input-time');
+                    if (inputs.length >= 2) {
+                        defaultStart = inputs[0].value;
+                        defaultEnd = inputs[1].value;
+                    }
+                    
+                    const daySelect = lastRow.querySelector('.input-day');
+                    if (daySelect) defaultDay = daySelect.value;
                 }
+            } else {
+                // SI NOS PASAN DATOS (Modo Edición), USAMOS ESOS
+                defaultDay = savedDay;
+                defaultStart = savedStart;
+                defaultEnd = savedEnd;
             }
-            // ----------------------------------------------
 
             const div = document.createElement('div');
             div.className = 'time-row';
             
-            // Creamos el HTML igual que antes
             div.innerHTML = `
                 <select class="input-day">
                     <option value="0">Lunes</option>
@@ -256,24 +291,24 @@
                     <option value="5">Sábado</option>
                 </select>
                 
-                <input type="time" class="input-time" value="${prevStart}" required>
+                <input type="time" class="input-time" value="${defaultStart}" required>
                 <span style="align-self:center">-</span>
-                <input type="time" class="input-time" value="${prevEnd}" required>
+                <input type="time" class="input-time" value="${defaultEnd}" required>
                 
                 <button class="btn-remove-row" type="button" onclick="removeTimeRow(this)">
                     <i class="fa-solid fa-trash"></i>
                 </button>
             `;
             
-            // Asignar el día copiado
-            div.querySelector('.input-day').value = prevDay;
+            // Asignar el día seleccionado
+            div.querySelector('.input-day').value = defaultDay;
             
             container.appendChild(div);
         }
 
         // 3. BORRAR FILA DE HORARIO
-        function removeTimeRow(rowId) {
-            const row = document.getElementById(`row-${rowId}`);
+        function removeTimeRow(btn) {
+            const row = btn.closest('.time-row');
             if (row) row.remove();
         }
         function removeGroup(subjectId, groupId) {
@@ -288,57 +323,68 @@
             }
         }
 
-        // 4. GUARDAR GRUPO (CONFIRM)
-        function confirmAddGroup() {
-            const profName = document.getElementById('profNameInput').value.trim();
-            if (!profName) {
-                alert("Falta el nombre del profesor");
-                return;
-            }
-
-            // Recolectar Horarios recorriendo el DOM
-            const container = document.getElementById('timeBlocksContainer');
-            const rows = container.getElementsByClassName('time-row');
-            let schedules = [];
-
-            for (let row of rows) {
-                // Obtenemos los inputs dentro de esta fila
-                const daySelect = row.querySelector('.input-day');
-                const startInput = row.querySelector('.input-time:nth-of-type(1)');
-                const endInput = row.querySelector('.input-time:nth-of-type(2)');
-
-                if (startInput.value && endInput.value) {
-                    schedules.push({
-                        day: parseInt(daySelect.value), // 0-5
-                        dayName: DAYS[parseInt(daySelect.value)].substring(0,3).toUpperCase(), // "LUN"
-                        start: startInput.value, // "07:00"
-                        end: endInput.value      // "09:00"
-                    });
-                }
-            }
-
-            if (schedules.length === 0) {
-                alert("Debes agregar al menos un horario válido (Inicio y Fin).");
-                return;
-            }
-
-            // Agregar al JSON global
-            const subject = subjectsData.find(s => s.id === currentSubjectId);
-            if (subject) {
-                subject.groups.push({
-                    id: Date.now(),
-                    professor: profName,
-                    schedules: schedules
-                });
-                saveCatalog();
-                renderBoard(); // Actualizar UI
-                closeModal('groupModal');
-            }
-        }
+       
         function toggleAccordion(subjectId) {
             const column = document.getElementById(`col-${subjectId}`);
             // Simplemente quitamos o ponemos la clase 'expanded'
             column.classList.toggle('expanded');
+        }
+        function saveGroup() {
+            const profName = document.getElementById('profName').value.trim();
+            if (!profName) {
+                alert("Ingresa el nombre del profesor.");
+                return;
+            }
+
+            // Recopilar Horarios (Igual que antes)
+            const rows = document.querySelectorAll('.time-row');
+            const schedules = [];
+            
+            for (let row of rows) {
+                const day = parseInt(row.querySelector('.input-day').value);
+                const start = row.querySelectorAll('.input-time')[0].value;
+                const end = row.querySelectorAll('.input-time')[1].value;
+
+                if (!start || !end) {
+                    alert("Completa todos los horarios.");
+                    return;
+                }
+                if (start >= end) {
+                    alert("La hora de inicio debe ser menor a la de fin.");
+                    return;
+                }
+
+                const daysMap = ["LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB"];
+                schedules.push({
+                    day: day,
+                    dayName: daysMap[day],
+                    start: start,
+                    end: end
+                });
+            }
+
+            // --- LÓGICA NUEVA: GUARDAR O ACTUALIZAR ---
+            const subject = subjectsData.find(s => s.id === currentSubjectId);
+
+            if (editingGroupId === null) {
+                // CREAR NUEVO
+                const newGroup = {
+                    id: Date.now(),
+                    professor: profName,
+                    schedules: schedules,
+                    active: true
+                };
+                subject.groups.push(newGroup);
+            } else {
+                // ACTUALIZAR EXISTENTE
+                const group = subject.groups.find(g => g.id === editingGroupId);
+                group.professor = profName;
+                group.schedules = schedules;
+            }
+            // ------------------------------------------
+
+            closeModal('groupModal');
+            renderBoard();
         }
 
         // templates/builder.html - Script
@@ -514,10 +560,10 @@
     </div>
 </div>
 <div id="groupModal" class="modal-overlay">
-    <div class="modal-card" style="width: 500px;"> <h3>Nuevo Grupo</h3>
-        <p>Configura el profesor y sus horarios</p>
+    <div class="modal-card" style="width: 500px;"> 
+        <h3>Nuevo Grupo</h3> <p>Configura el profesor y sus horarios</p>
 
-        <input type="text" id="profNameInput" class="modal-input" placeholder="Nombre del Profesor (Ej. Michel Bechara)" autocomplete="off">
+        <input type="text" id="profName" class="modal-input" placeholder="Nombre del Profesor (Ej. Michel Bechara)" autocomplete="off">
 
         <div style="text-align: left; margin-bottom: 10px;">
             <label style="font-size: 0.9rem; color: #666; margin-left: 5px;">Horarios de clase:</label>
@@ -532,7 +578,8 @@
         
         <div class="modal-actions" style="margin-top: 30px;">
             <button class="btn-cancel" onclick="closeModal('groupModal')">Cancelar</button>
-            <button class="btn-confirm" onclick="confirmAddGroup()">Guardar Grupo</button>
+            
+            <button id="btnSaveGroup" class="btn-confirm" onclick="saveGroup()">Guardar Grupo</button>
         </div>
     </div>
 </div>

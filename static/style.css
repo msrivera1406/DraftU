@@ -1135,6 +1135,10 @@ body {
     color: #ff6b6b;
     background-color: rgba(255, 107, 107, 0.1);
 }
+.group-icon-btn.edit-group:hover {
+    color: #FFAD4D; /* Tu naranja corporativo */
+    background-color: rgba(255, 173, 77, 0.1);
+}
 
 @media screen and (max-width: 768px) {
     * {
