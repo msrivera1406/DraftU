@@ -33,13 +33,7 @@ def builder():
 
 @app.route('/generate-schedule', methods=['POST'])
 def generate_schedule():
-    """
-    1. Recibe el JSON del Frontend.
-    2. Lo transforma al formato que C++ necesita.
-    3. Ejecuta C++.
-    4. Devuelve el resultado.
-    """
-    
+
     # 1. RECIBIR DATOS DEL FRONTEND
     frontend_data = request.json 
     # 2. TRANSFORMAR PARA C++ (Adaptador)
