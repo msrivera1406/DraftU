@@ -8,6 +8,34 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Badge de Cupos */
+        .seats-badge {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: #e0e0e0;
+            color: #555;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .seats-badge.full {
+            background-color: #ffebee;
+            color: #d32f2f;
+            border: 1px solid #ffcdd2;
+        }
+        .seats-badge.warning {
+            background-color: #fff8e1;
+            color: #f57c00;
+            border: 1px solid #ffecb3;
+        }
+    </style>
 </head>
 <body>
     <div class="builder-container">
@@ -17,8 +45,12 @@
             </a>
         </header>
         <div class="intro-text" id="introText">
-             <h2>CATÁLOGO DE CLASES</h2>
-            <p>Ingresa tus materias y profesores para generar las alternativas posibles</p>
+            <h2>SIMULACIÓN DE INSCRIPCIONES</h2> <p>Modo Demo: Disponibilidad en tiempo real</p>
+            
+            <button id="btnSimulate" onclick="simulateLiveEnrollment()" 
+                    style="background: #333; border: 1px solid #FFAD4D; color: #FFAD4D; padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 15px; font-weight: 500;">
+                <i class="fa-solid fa-bolt"></i> Simular Disponibilidad en Vivo
+            </button>
         </div>
         <div class="board-canvas" id="boardCanvas">
             <div class="cards-wrapper" id="cardsWrapper">
@@ -51,25 +83,28 @@
 
         function openAddSubjectModal() {
             document.getElementById('subjectModal').classList.add('active');
-            document.getElementById('subjectNameInput').focus(); 
+            document.getElementById('subjectNameInput').focus(); // Pone el cursor directo para escribir
         }
         function openGroupModal(subjectId, groupId = null) {
             currentSubjectId = subjectId;
-            editingGroupId = groupId; 
+            editingGroupId = groupId; // Guardamos el ID (puede ser null o un número)
             
             const modalTitle = document.querySelector('#groupModal h3');
             const inputName = document.getElementById('profName');
             const container = document.getElementById('timeBlocksContainer');
             const btnSave = document.getElementById('btnSaveGroup');
 
+            // Limpiar formulario previo
             container.innerHTML = ''; 
             inputName.value = '';
 
             if (groupId === null) {
+                // MODO CREAR
                 modalTitle.innerText = "Nuevo Grupo";
                 btnSave.innerText = "Guardar Grupo";
-                addTimeRow(); 
+                addTimeRow(); // Añadir una fila vacía
             } else {
+                // MODO EDITAR
                 modalTitle.innerText = "Editar Grupo";
                 btnSave.innerText = "Actualizar Grupo";
 
@@ -119,6 +154,8 @@
             // C. Cerrar y limpiar
             closeModal('subjectModal');
         }
+/* simulation.html -> script -> renderBoard (CORREGIDO) */
+
         function renderBoard() {
             saveCatalog(); // Guardamos cambios por si acaso
             
@@ -127,20 +164,18 @@
 
             subjectsData.forEach((subject, index) => {
                 // --- 1. DETECTAR SI LA MATERIA ESTÁ ACTIVA ---
-                // Si no existe la propiedad (backwards compatibility), asumimos true
                 const isSubActive = subject.active !== false; 
                 const subOpacityClass = isSubActive ? '' : 'inactive-item';
                 const subEyeIcon = isSubActive ? 'fa-eye' : 'fa-eye-slash';
                 
-                // Colores: Si está inactiva, el header se verá gris por el filtro CSS
                 const colors = ['#FFD1DC', '#D1E8FF', '#E8D1FF', '#D1FFD6']; 
                 const bgColor = colors[index % colors.length];
 
                 let groupsHTML = '';
                 
+                // --- AQUÍ EMPIEZA EL BUCLE DE GRUPOS ---
                 if (subject.groups && subject.groups.length > 0) {
                     subject.groups.forEach(group => {
-                        // --- 2. DETECTAR SI EL GRUPO ESTÁ ACTIVO ---
                         const isGroupActive = group.active !== false;
                         const groupOpacityClass = isGroupActive ? '' : 'inactive-item';
                         const groupEyeIcon = isGroupActive ? 'fa-eye' : 'fa-eye-slash';
@@ -149,6 +184,26 @@
                         group.schedules.forEach(sch => {
                             timeBadges += `<span class="schedule-badge">${sch.dayName} ${sch.start}-${sch.end}</span>`;
                         });
+
+                        // --- AHORA SÍ: LÓGICA DE CUPOS (DENTRO DEL BUCLE) ---
+                        if (group.seats === undefined) group.seats = 30; // Default
+                        let seatClass = '';
+                        let seatIcon = 'fa-users';
+
+                        if (group.seats === 0) {
+                            seatClass = 'full';
+                            seatIcon = 'fa-ban';
+                        } else if (group.seats <= 5) {
+                            seatClass = 'warning';
+                        }
+
+                        const seatsHTML = `
+                            <div class="seats-badge ${seatClass}" title="Lugares disponibles">
+                                <i class="fa-solid ${seatIcon}"></i> 
+                                ${group.seats}/30
+                            </div>
+                        `;
+                        // ----------------------------------------------------
 
                         groupsHTML += `
                             <div class="group-card ${groupOpacityClass}">
@@ -176,6 +231,8 @@
                                         <i class="fa-solid fa-xmark"></i>
                                     </div>
                                 </div>
+
+                                ${seatsHTML}
                             </div>
                         `;
                     });
@@ -217,7 +274,7 @@
                 wrapper.innerHTML += columnHTML;
             });
 
-            // Columna de "Agregar Materia" (Sin cambios)
+            // Columna de "Agregar Materia"
             const addColumnHTML = `
                 <div class="column expanded" id="addSubjectColumn">
                     <div class="card-dashed" onclick="openAddSubjectModal()">
@@ -227,12 +284,33 @@
             `;
             wrapper.innerHTML += addColumnHTML;
         }
-
         function openDeleteModal(id) {
             idToDelete = id; 
             document.getElementById('deleteModal').classList.add('active');
         }
-
+        function simulateLiveEnrollment() {
+            subjectsData.forEach(sub => {
+                sub.groups.forEach(group => {
+                    // Probabilidades: 30% lleno, 30% casi lleno, 40% libre
+                    const luck = Math.random();
+                    if (luck < 0.3) {
+                        group.seats = 0; // LLENO TOTAL
+                    } else if (luck < 0.6) {
+                        group.seats = Math.floor(Math.random() * 5) + 1; // 1-5 lugares
+                    } else {
+                        group.seats = Math.floor(Math.random() * 15) + 15; // 15-30 lugares
+                    }
+                });
+            });
+            renderBoard();
+            
+            // Efecto visual en el botón
+            const btn = document.getElementById('btnSimulate');
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Sistema Actualizado!';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fa-solid fa-bolt"></i> Simular Disponibilidad en Vivo';
+            }, 2000);
+        }
         
         function confirmDeleteSubject() {
             if (idToDelete !== null) {
@@ -387,6 +465,13 @@
         // templates/builder.html - Script
 
         async function submitData() {
+            const btn = document.querySelector('.generate-btn'); // <--- FALTABA ESTO
+            const originalText = btn.innerText;                  // <--- Y ESTO
+    
+            // Cambiar estado visual del botón
+            btn.innerText = "Pensando...";
+            btn.disabled = true;
+            btn.style.backgroundColor = "#ccc";
             // 1. Validar que haya datos
             const activePayload = subjectsData
                     // A. Filtrar materias ocultas
@@ -396,7 +481,7 @@
                         return {
                             ...sub,
                             // C. Filtrar grupos ocultos dentro de la materia
-                            groups: sub.groups.filter(g => g.active !== false)
+                            groups: sub.groups.filter(g => g.active !== false && g.seats > 0)
                         };
                     })
                     // D. Seguridad: Si una materia se quedó sin grupos visibles, la quitamos también
@@ -424,7 +509,7 @@
                 const result = await response.json();
 
                 setTimeout(() => {
-                    hideLoadingScreen(); // Ocultar carga
+                    hideLoadingScreen(); 
                             
                     if (result.status === "error") {
                         alert("Error: " + result.message);
@@ -432,7 +517,7 @@
                         localStorage.setItem('schedulesResult', JSON.stringify(result));
                         window.location.href = "/results";
                     }
-                }, 3000); // Forzar 2 segundos mínimo de "magia"
+                }, 3000); 
 
             } catch (error) {
                 console.error("Error:", error);
@@ -461,12 +546,8 @@
             const textElement = document.getElementById('loadingText');
             const zone = document.getElementById('fallingLinesZone');
             
-            // 1. Mostrar Overlay
             overlay.classList.add('active');
             
-            
-
-            // 3. Rotar Texto
             let phraseIndex = 0;
             textElement.innerText = LOADING_PHRASES[0];
             

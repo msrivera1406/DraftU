@@ -15,6 +15,43 @@ else: # Linux (Render)
     EXECUTABLE_NAME = "./ProyectoPED" # Sin extensión .exe
     RUN_COMMAND = [EXECUTABLE_NAME]
 
+# def detect_specific_conflict(data):
+#     subjects = data 
+    
+#     def schedules_overlap(sched1, sched2):
+#         for s1 in sched1:
+#             for s2 in sched2:
+#                 if s1['day'] == s2['day']: 
+#                     start1 = int(s1['start'].replace(':', ''))
+#                     end1 = int(s1['end'].replace(':', ''))
+#                     start2 = int(s2['start'].replace(':', ''))
+#                     end2 = int(s2['end'].replace(':', ''))
+                    
+#                     if max(start1, start2) < min(end1, end2):
+#                         return True
+#         return False
+
+#     for i in range(len(subjects)):
+#         for j in range(i + 1, len(subjects)):
+#             sub_a = subjects[i]
+#             sub_b = subjects[j]
+            
+          
+#             conflict_exists = True 
+            
+#             for group_a in sub_a['groups']:
+#                 for group_b in sub_b['groups']:
+#                     if not schedules_overlap(group_a['schedules'], group_b['schedules']):
+#                         conflict_exists = False
+#                         break 
+#                 if not conflict_exists:
+#                     break
+        
+#             if conflict_exists:
+#                 return f"Incompatible: '{sub_a['name']}' y '{sub_b['name']}' se empalman en todas sus opciones."
+
+#     return "Conflicto complejo (más de 2 materias involucradas o falta de cupos)."
+
 def time_to_minutes(time_str):
     if not time_str: return 0
     try:
@@ -22,6 +59,10 @@ def time_to_minutes(time_str):
         return hours * 60 + minutes
     except: 
         return 0
+
+@app.route('/simulation')
+def simulation():
+    return render_template('simulation.html')
 
 @app.route('/results')
 def results():
@@ -34,8 +75,8 @@ def builder():
 @app.route('/generate-schedule', methods=['POST'])
 def generate_schedule():
 
-    # 1. RECIBIR DATOS DEL FRONTEND
     frontend_data = request.json 
+    data=request.json
     # 2. TRANSFORMAR PARA C++ (Adaptador)
     cpp_input = []
     
@@ -73,11 +114,8 @@ def generate_schedule():
         return jsonify({"status": "error", "message": f"Error escribiendo input: {str(e)}"}), 500
     
     # 3. EJECUTAR C++
-    # Comando: ProyectoPED.exe --headless output.json input.json
     try:
         cmd = RUN_COMMAND + ["--headless", OUTPUT_FILE, INPUT_FILE]
-        
-        # shell=True solo es necesario en Windows
         subprocess.run(cmd, check=True, shell=(os.name=='nt'))
             
     except subprocess.CalledProcessError:
